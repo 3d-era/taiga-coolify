@@ -94,7 +94,7 @@ services:
     image: taigaio/taiga-front:latest
     environment:
       - TAIGA_URL=${TAIGA_SCHEME:-https}://${TAIGA_DOMAIN:?}
-      - TAIGA_WEBSOCKETS_URL=${WEBSOCKETS_SCHEME:-wss}://${TAIGA_DOMAIN:?}
+      - TAIGA_WEBSOCKETS_URL=${WEBSOCKETS_SCHEME:-wss}://${TAIGA_DOMAIN:?}/events
       - TZ=${TIMEZONE:-Asia/Ho_Chi_Minh}
     volumes:
       - taiga-static:/taiga-front/dist/static
@@ -125,14 +125,15 @@ services:
       - taiga-async-rabbitmq
     restart: unless-stopped
     expose:
-      - "8888"
+      - "3023"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.taiga-events.rule=Host(`${TAIGA_DOMAIN:?}`) && PathPrefix(`/events`)"
       - "traefik.http.routers.taiga-events.entrypoints=https"
       - "traefik.http.routers.taiga-events.tls=true"
       - "traefik.http.routers.taiga-events.tls.certresolver=letsencrypt"
-      - "traefik.http.services.taiga-events.loadbalancer.server.port=8888"
+      - "traefik.http.services.taiga-events.loadbalancer.server.port=3023"
+      - "traefik.http.routers.taiga-events.priority=10"
 
   taiga-protected:
     image: taigaio/taiga-protected:latest
