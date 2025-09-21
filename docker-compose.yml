@@ -128,15 +128,12 @@ services:
       - "3023"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.taiga-events.rule=Host(`${TAIGA_DOMAIN:?}`) && Path(`/events`)"
+      - "traefik.http.routers.taiga-events.rule=Host(`${TAIGA_DOMAIN:?}`) && PathPrefix(`/events`)"
       - "traefik.http.routers.taiga-events.entrypoints=https"
       - "traefik.http.routers.taiga-events.tls=true"
       - "traefik.http.routers.taiga-events.tls.certresolver=letsencrypt"
       - "traefik.http.services.taiga-events.loadbalancer.server.port=3023"
       - "traefik.http.routers.taiga-events.priority=100"
-      # Remove /events prefix when forwarding to backend
-      - "traefik.http.middlewares.taiga-events-stripprefix.stripprefix.prefixes=/events"
-      - "traefik.http.routers.taiga-events.middlewares=taiga-events-stripprefix"
 
   taiga-protected:
     image: taigaio/taiga-protected:latest
