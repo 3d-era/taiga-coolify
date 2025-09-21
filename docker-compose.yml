@@ -41,6 +41,15 @@ services:
       taiga-db:
         condition: service_healthy
     restart: unless-stopped
+    expose:
+      - "8000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.taiga-api.rule=Host(`${TAIGA_DOMAIN:?}`) && (PathPrefix(`/api/`) || PathPrefix(`/admin/`))"
+      - "traefik.http.routers.taiga-api.entrypoints=https"
+      - "traefik.http.routers.taiga-api.tls=true"
+      - "traefik.http.routers.taiga-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.taiga-back.loadbalancer.server.port=8000"
 
   taiga-async:
     image: taigaio/taiga-back:latest
@@ -91,6 +100,16 @@ services:
       - taiga-static:/taiga-front/dist/static
       - taiga-media:/taiga-front/dist/media
     restart: unless-stopped
+    expose:
+      - "80"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.taiga-front.rule=Host(`${TAIGA_DOMAIN:?}`)"
+      - "traefik.http.routers.taiga-front.entrypoints=https"
+      - "traefik.http.routers.taiga-front.tls=true"
+      - "traefik.http.routers.taiga-front.tls.certresolver=letsencrypt"
+      - "traefik.http.services.taiga-front.loadbalancer.server.port=80"
+      - "traefik.http.routers.taiga-front.priority=1"
 
   taiga-events:
     image: taigaio/taiga-events:latest
@@ -105,6 +124,15 @@ services:
     depends_on:
       - taiga-async-rabbitmq
     restart: unless-stopped
+    expose:
+      - "8888"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.taiga-events.rule=Host(`${TAIGA_DOMAIN:?}`) && PathPrefix(`/events`)"
+      - "traefik.http.routers.taiga-events.entrypoints=https"
+      - "traefik.http.routers.taiga-events.tls=true"
+      - "traefik.http.routers.taiga-events.tls.certresolver=letsencrypt"
+      - "traefik.http.services.taiga-events.loadbalancer.server.port=8888"
 
   taiga-protected:
     image: taigaio/taiga-protected:latest
