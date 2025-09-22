@@ -45,6 +45,7 @@ services:
       - "8000"
     labels:
       - "traefik.enable=true"
+      - "coolify.fqdn="
       - "traefik.http.routers.taiga-api.rule=Host(`${TAIGA_DOMAIN:?}`) && (PathPrefix(`/api/`) || PathPrefix(`/admin/`))"
       - "traefik.http.routers.taiga-api.entrypoints=https"
       - "traefik.http.routers.taiga-api.tls=true"
@@ -101,10 +102,11 @@ services:
       - taiga-static:/taiga-front/dist/static
       - taiga-media:/taiga-front/dist/media
     restart: unless-stopped
-    expose:
+    ports:
       - "80"
     labels:
       - "traefik.enable=true"
+      - "coolify.fqdn=pj.f3d.me"
       - "traefik.http.routers.taiga-front.rule=Host(`${TAIGA_DOMAIN:?}`) && !PathPrefix(`/events`) && !PathPrefix(`/api/`) && !PathPrefix(`/admin/`)"
       - "traefik.http.routers.taiga-front.entrypoints=https"
       - "traefik.http.routers.taiga-front.tls=true"
@@ -125,10 +127,11 @@ services:
     depends_on:
       - taiga-async-rabbitmq
     restart: unless-stopped
-    expose:
+    ports:
       - "3023"
     labels:
       - "traefik.enable=true"
+      - "coolify.fqdn="
       - "traefik.http.routers.taiga-events.rule=Host(`${TAIGA_DOMAIN:?}`) && PathPrefix(`/events`)"
       - "traefik.http.routers.taiga-events.entrypoints=https"
       - "traefik.http.routers.taiga-events.tls=true"
