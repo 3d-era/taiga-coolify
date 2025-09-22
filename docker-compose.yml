@@ -49,6 +49,7 @@ services:
       - "traefik.http.routers.taiga-api.entrypoints=https"
       - "traefik.http.routers.taiga-api.tls=true"
       - "traefik.http.routers.taiga-api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.taiga-api.priority=20"
       - "traefik.http.services.taiga-back.loadbalancer.server.port=8000"
 
   taiga-async:
@@ -104,12 +105,12 @@ services:
       - "80"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.taiga-front.rule=Host(`${TAIGA_DOMAIN:?}`)"
+      - "traefik.http.routers.taiga-front.rule=Host(`${TAIGA_DOMAIN:?}`) && !PathPrefix(`/events`) && !PathPrefix(`/api/`) && !PathPrefix(`/admin/`)"
       - "traefik.http.routers.taiga-front.entrypoints=https"
       - "traefik.http.routers.taiga-front.tls=true"
       - "traefik.http.routers.taiga-front.tls.certresolver=letsencrypt"
-      - "traefik.http.services.taiga-front.loadbalancer.server.port=80"
       - "traefik.http.routers.taiga-front.priority=1"
+      - "traefik.http.services.taiga-front.loadbalancer.server.port=80"
 
   taiga-events:
     image: taigaio/taiga-events:latest
@@ -132,8 +133,8 @@ services:
       - "traefik.http.routers.taiga-events.entrypoints=https"
       - "traefik.http.routers.taiga-events.tls=true"
       - "traefik.http.routers.taiga-events.tls.certresolver=letsencrypt"
-      - "traefik.http.services.taiga-events.loadbalancer.server.port=3023"
       - "traefik.http.routers.taiga-events.priority=100"
+      - "traefik.http.services.taiga-events.loadbalancer.server.port=3023"
 
   taiga-protected:
     image: taigaio/taiga-protected:latest
